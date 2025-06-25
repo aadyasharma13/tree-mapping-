@@ -86,7 +86,7 @@ exports.createTag = async (req, res) => {
     // Add photos if available
     if (req.files && req.files.length > 0) {
       newTag.photos = req.files.map(file => ({
-        url: file.path, // This will be updated in the upload middleware
+        url: file.url,
         public_id: file.filename
       }));
     }
@@ -140,7 +140,7 @@ exports.deleteTag = async (req, res) => {
       return res.status(404).json({ message: 'Tag not found' });
     }
     
-    await tag.remove();
+    await Tag.deleteOne({ _id: req.params.id });
     res.json({ message: 'Tag removed' });
   } catch (error) {
     console.error(error);

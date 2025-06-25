@@ -1,32 +1,22 @@
 const multer = require('multer');
 const path = require('path');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const fs = require('fs');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Create uploads directory if it doesn't exist
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// For local development/testing, comment out the CloudinaryStorage and use diskStorage
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'uploads/');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, `${Date.now()}-${file.originalname}`);
-//   }
-// });
-
-// Setup CloudinaryStorage
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'tree-mapping',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
-    transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+// Configure local disk storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${uniqueSuffix}${ext}`);
   }
 });
 
@@ -50,4 +40,23 @@ const upload = multer({
   fileFilter
 });
 
-module.exports = upload; 
+// Custom middleware to add URLs to files after upload
+const processUploadedFiles = (req, res, next) => {
+  if (!req.files) return next();
+  
+  // Add URL to each file
+  req.files = req.files.map(file => {
+    const relativePath = path.relative(path.join(__dirname, '..'), file.path).replace(/\\/g, '/');
+    return {
+      ...file,
+      url: `http://${req.headers.host}/${relativePath}`
+    };
+  });
+  
+  next();
+};
+
+module.exports = {
+  upload,
+  processUploadedFiles
+}; 

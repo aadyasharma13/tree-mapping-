@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const tagController = require('../controllers/tagController');
-const uploadMiddleware = require('../middleware/upload');
+const { upload, processUploadedFiles } = require('../middleware/upload');
 
 // GET /api/tags - Get all tags
 router.get('/', tagController.getTags);
@@ -15,7 +15,8 @@ router.get('/:id', tagController.getTagById);
 
 // POST /api/tags - Create a new tag
 router.post('/', 
-  uploadMiddleware.array('photos', 5), // Allow up to 5 photos
+  upload.array('photos', 5), // Allow up to 5 photos
+  processUploadedFiles, // Process uploaded files to add URLs
   [
     check('title', 'Title is required').not().isEmpty(),
     check('description', 'Description is required').not().isEmpty(),
