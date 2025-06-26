@@ -7,16 +7,29 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await fetch('/api/auth/register', {
+  e.preventDefault();
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(form),
+  });
+
+  if (res.ok) {
+    // Auto-login after registration
+    const loginRes = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ email: form.email, password: form.password }),
     });
-
-    if (res.ok) router.push('/profile');
-    else alert('Registration failed');
-  };
+    if (loginRes.ok) {
+      router.push('/profile');
+    } else {
+      alert('Auto-login failed');
+    }
+  } else {
+    alert('Registration failed');
+  }
+};
 
   return (
     <div style={{
