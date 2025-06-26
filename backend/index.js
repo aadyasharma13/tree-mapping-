@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const tagRoutes = require('./routes/tagRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -22,7 +22,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/tags', tagRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -38,10 +38,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+// MongoDB Connection with fallback
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://treemapping:treemapping@cluster0.mongodb.net/tree-mapping?retryWrites=true&w=majority')
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.log('Using fallback connection or local development mode');
+  });
 
 // Setup geospatial index
 require('./utils/geoIndex');
