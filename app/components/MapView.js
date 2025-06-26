@@ -30,7 +30,7 @@ function MapClickHandler({ onMapClick }) {
 }
 
 // API URL constant
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5002/api';
 
 export default function MapView() {
   const [tags, setTags] = useState([]);

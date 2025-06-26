@@ -7,7 +7,7 @@ const tagRoutes = require('./routes/tagRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 
 // Middleware
 app.use(cors({
@@ -50,6 +50,6 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://treemapping:treemappi
 require('./utils/geoIndex');
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(5002, () => {
+  console.log(`Server running on port 5002`);
 }); 

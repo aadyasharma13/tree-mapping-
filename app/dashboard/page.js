@@ -15,7 +15,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         // In a real app, fetch data from your backend API
-        // const response = await fetch('http://localhost:5000/api/users/dashboard', {
+        // const response = await fetch('http://localhost:5002/api/users/dashboard', {
         //   headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         // });
         // const data = await response.json();
